@@ -14,14 +14,15 @@ export default function Home() {
 
   return (
     <div>
-      {/* <ReactMapGL
+      mapp
+      <ReactMapGL
         {...viewport}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         onViewportChange={(nextViewport: React.SetStateAction<{ width: string; height: string; latitude: number; longitude: number; zoom: number; }>) => setViewport(nextViewport)}
       >
         <NavigationControl style={{ position: 'absolute', top: 10, left: 10 }} />
-      </ReactMapGL> */}
+      </ReactMapGL>
     </div>
   );
 }

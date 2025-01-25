@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "mapbox-gl": "^3.9.3",
     "next": "^15.1.6",
     "pg": "^8.13.1",
     "react": "^19.0.0",
@@ -8,6 +9,7 @@
     "react-map-gl": "^7.1.8"
   },
   "devDependencies": {
+    "@types/node": "22.10.10",
     "@types/pg": "^8.11.11",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
