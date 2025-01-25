@@ -1,36 +1,47 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:13
-    container_name: postgres
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydatabase
+  database:
+    image: mongo:latest
+    container_name: mongo-database
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongo-data:/data/db
     networks:
       - app_network
 
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile  # Make sure this points to your Next.js Dockerfile
+      dockerfile: Dockerfile  # Make sure this points to the Next.js Dockerfile
     container_name: nextjs_app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_URL=mongodb://mongo-database:27017/app
+    depends_on:
+      - database
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://user:password@postgres:5432/mydatabase
+      - DB_URL=mongodb://mongo-database:27017/app
     depends_on:
-      - postgres
+      - database
     networks:
       - app_network
 
 volumes:
-  postgres_data:
+    mongo-data:
+      driver: local
 
 networks:
   app_network:

@@ -1,6 +1,6 @@
 // src/components/MapComponent.tsx
 import React, { useEffect, useRef } from "react";
-import mapboxgl, { GeoJSONSourceRaw } from "mapbox-gl";
+import mapboxgl from "mapbox-gl";
 
 interface MovingObject {
   id: number;
