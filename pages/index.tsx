@@ -1,29 +1,48 @@
-import React, { useState } from 'react';
-import ReactMapGL, { NavigationControl } from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+// src/components/MapComponent.tsx
+import React, { useEffect, useRef } from "react";
+import mapboxgl, { GeoJSONSourceRaw } from "mapbox-gl";
 
-export default function Home() {
-  const [viewPort, setViewPort] = useState({
-    width: '100vw',
-    height: '100vh',
-    latitude: 45.4211,
-    longitude: -75.6903,
-    zoom: 10
-  });
+interface MovingObject {
+  id: number;
+  name: string;
+  coordinates: number[];
+}
+
+const MapComponent: React.FC = () => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+
+  const movingObjects: MovingObject[] = [
+    // Define your moving objects here
+  ];
+
+  useEffect(() => {
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
+    if (mapContainer.current) {
+      const map = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: [-74.0060152, 40.7127281],
+        zoom: 5,
+        maxZoom: 15,
+      });
+
+      // Add zoom controls
+      map.addControl(new mapboxgl.NavigationControl(), "top-left");
+
+      // Add your custom markers and lines here
+
+      // Clean up on unmount
+      return () => map.remove();
+    }
+  }, []);
 
   return (
-    <div>
-      <ReactMapGL
-        {...viewPort}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-        onMove={evt => setViewPort({
-          ...viewPort,
-          ...evt.viewState
-        })}
-      >
-        <NavigationControl position="top-left" />
-      </ReactMapGL>
-    </div>
+    <div
+      ref={mapContainer}
+      style={{ position: "absolute", top: 0, bottom: 0, width: "100%" }}
+    />
   );
-}
+};
+
+export default MapComponent;
