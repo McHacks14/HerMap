@@ -1,14 +1,21 @@
 {
   "dependencies": {
     "next": "^15.1.6",
+    "pg": "^8.13.1",
     "react": "^19.0.0",
     "react-dev": "^0.0.1",
     "react-dom": "^19.0.0",
     "react-map-gl": "^7.1.8"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.11",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "typescript": "^5.7.3"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   }
 }
