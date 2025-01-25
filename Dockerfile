@@ -2,7 +2,7 @@
 FROM node:18-alpine
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /appgit push origin main
 
 # Copy the package.json and package-lock.json (or yarn.lock)
 COPY package*.json ./
