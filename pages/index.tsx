@@ -31,6 +31,28 @@ const MapComponent: React.FC = () => {
       map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
       // Add your custom markers and lines here
+      map.on('style.load', () => {
+        map.setFog({});
+      });
+
+      map.on('load', () => {
+        map.addSource('earthquakes', {
+          type: 'geojson',
+          data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson'
+        });
+
+        map.addLayer({
+          id: 'earthquakes-layer',
+          type: 'circle',
+          source: 'earthquakes',
+          paint: {
+            'circle-radius': 4,
+            'circle-stroke-width': 2,
+            'circle-color': 'red',
+            'circle-stroke-color': 'white'
+          }
+        });
+      });
 
       // Clean up on unmount
       return () => map.remove();
