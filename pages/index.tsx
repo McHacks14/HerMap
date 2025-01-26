@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 interface MovingObject {
   id: number;
   name: string;
@@ -34,6 +36,10 @@ const MapComponent: React.FC = () => {
       map.on("style.load", () => {
         map.setFog({});
       });
+
+      const popup = new mapboxgl.Popup({ offset: 25 }).setText(
+        'Construction on the Washington Monument began in 1848.'
+      );
 
       type ApiResponse = Array<{
         _id: string;
@@ -70,12 +76,28 @@ const MapComponent: React.FC = () => {
         try {
           const response = await fetch("http://127.0.0.1:8001/api/pins");
           const apiResponse = await response.json();
-          //console.log(response);
           console.log(apiResponse);
 
           const geojsonData = formatApiResponse(apiResponse);
+          console.log(geojsonData);
 
-          // Load GeoJSON data on map
+          // for (const feature of geojsonData.features) {
+          //   const el = document.createElement('div');
+          //   el.className = 'marker';
+          //   new mapboxgl.Marker(el)
+          //     .setLngLat([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
+          //     .setPopup(
+          //       new mapboxgl.Popup({ offset: 25 }) // add popups
+          //         .setHTML(
+          //           `${feature.properties ? `<h3>${feature.properties.reviewText}</h3><p>${feature.properties.safetyRating}</p>` : 'No data available'}`
+          //         )
+          //     )
+          //     .addTo(map); 
+          //     console.log("Successfully added marker");
+          
+          // }
+
+          //Load GeoJSON data on map
           map.on("load", () => {
             map.addSource("points", {
               type: "geojson",
@@ -93,7 +115,34 @@ const MapComponent: React.FC = () => {
                 "circle-stroke-color": "#ffffff",
               },
             });
+
+            map.on('mouseenter', 'points-layer', (e) => {
+              map.getCanvas().style.cursor = 'pointer';
+
+              const features = map.queryRenderedFeatures(e.point);
+              let longitude = (features[0].geometry as GeoJSON.Point).coordinates[0];
+              const latitude = (features[0].geometry as GeoJSON.Point).coordinates[1];
+              const { safetyRating, reviewText } = features[0].properties as { safetyRating: number; reviewText: string };
+    
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              while (Math.abs(e.lngLat.lng - longitude) > 180) {
+                longitude += e.lngLat.lng > longitude ? 360 : -360;
+              }
+    
+              popup
+                .setLngLat([longitude, latitude])
+                .setHTML(`<h3>${safetyRating}</h3><p>${reviewText}</p>`)
+                .addTo(map);
+            });
+
+            map.on('mouseleave', 'points-layer', () => {
+              map.getCanvas().style.cursor = '';
+              popup.remove();
+            });
           });
+            
         } catch (error) {
           console.error(error);
         }
