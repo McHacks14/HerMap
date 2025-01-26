@@ -80,14 +80,6 @@ function loadPinApi(app: express.Application): void {
     });
   
   // Get all pins
-  app.get('/api/pins/user', async (req: Request, res: Response) => {
-    try {
-      const userPins = await PlacePin.find({ userId: (req as any).username });
-      res.status(200).json(userPins);
-    } catch (error) {
-      res.status(500).send('Could not retrieve user pins');
-    }
-  });
 
   app.get('/api/pins', async (req: Request, res: Response) => {
     try {
@@ -95,14 +87,10 @@ function loadPinApi(app: express.Application): void {
       res.json(userPins);
       console.log(userPins);
     } catch (error) {
-      res.status(500).send('Could not retrieve user pins');
+      res.send('Could not retrieve user pins');
     }
   });
 
-  app.get('/api', async (req: Request, res: Response) => {
-    res.send('Hello from the API!');
-  });
-  
 }
 
 export default loadPinApi;

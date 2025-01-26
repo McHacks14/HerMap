@@ -1,4 +1,3 @@
-// src/components/MapComponent.tsx
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 
@@ -11,11 +10,12 @@ interface MovingObject {
 const MapComponent: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
 
-  const movingObjects: MovingObject[] = [
-    // Define your moving objects here
-  ];
-
   useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
+      console.error("Mapbox access token is missing!");
+      return;
+    }
+
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
     if (mapContainer.current) {
@@ -30,39 +30,91 @@ const MapComponent: React.FC = () => {
       // Add zoom controls
       map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
-      // Add your custom markers and lines here
-      map.on('style.load', () => {
+      // Add fog styling
+      map.on("style.load", () => {
         map.setFog({});
       });
 
-      map.on('load', () => {
-        map.addSource('earthquakes', {
-          type: 'geojson',
-          data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson'
-        });
+      type ApiResponse = Array<{
+        _id: string;
+        latitude: number;
+        longitude: number;
+        safetyRating: number;
+        reviewText: string;
+        userId: string;
+      }>;
+      
 
-        map.addLayer({
-          id: 'earthquakes-layer',
-          type: 'circle',
-          source: 'earthquakes',
-          paint: {
-            'circle-radius': 4,
-            'circle-stroke-width': 2,
-            'circle-color': 'red',
-            'circle-stroke-color': 'white'
-          }
-        });
-      });
+      // Function to format API response
+      const formatApiResponse = (
+        apiResponse: ApiResponse
+      ): GeoJSON.FeatureCollection<GeoJSON.Point> => {
+        return {
+          type: "FeatureCollection",
+          features: apiResponse.map((item) => ({
+            type: "Feature",
+            properties: {
+              safetyRating: item.safetyRating,
+              reviewText: item.reviewText,
+              userId: item.userId,
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [item.longitude, item.latitude],
+            },
+          })),
+        };
+      };
 
-      // Clean up on unmount
+      const fetchData = async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:8001/api/pins");
+          const apiResponse = await response.json();
+          //console.log(response);
+          console.log(apiResponse);
+
+          const geojsonData = formatApiResponse(apiResponse);
+
+          // Load GeoJSON data on map
+          map.on("load", () => {
+            map.addSource("points", {
+              type: "geojson",
+              data: geojsonData,
+            });
+
+            map.addLayer({
+              id: "points-layer",
+              type: "circle",
+              source: "points",
+              paint: {
+                "circle-radius": 6,
+                "circle-color": "#007cbf",
+                "circle-stroke-width": 1,
+                "circle-stroke-color": "#ffffff",
+              },
+            });
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchData();
+
+      // Cleanup on unmount
       return () => map.remove();
     }
-  }, []);
+  }, []); // Empty dependency array ensures this runs once on mount
 
   return (
     <div
       ref={mapContainer}
-      style={{ position: "absolute", top: 0, bottom: 0, width: "100%" }}
+      style={{
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        width: "100%",
+      }}
     />
   );
 };
