@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import PlaceForm from "./PlaceForm";
+import TemporaryDrawer from "./ResponsiveDrawer";
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -12,8 +13,11 @@ interface MovingObject {
 
 const MapComponent: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const [formVisible, setFormVisible] = useState(true);
-  const [formPosition, setFormPosition] = useState<{ lng: number; lat: number } | null>(null);
+  const [open, setOpen] = React.useState(false);
+
+  const toggleDrawer = (newOpen: boolean | ((prevState: boolean) => boolean)) => () => {
+    setOpen(newOpen);
+  };
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
@@ -134,8 +138,9 @@ const MapComponent: React.FC = () => {
                 .setLngLat([lng, lat])
                 .addTo(map);
 
-              setFormPosition({ lng, lat });
-              setFormVisible(true);
+              toggleDrawer(true)();
+              // if form submitted, then create a new entry in db
+              
 
               console.log(`New marker added at [${lng}, ${lat}]`);
             });
@@ -158,11 +163,6 @@ const MapComponent: React.FC = () => {
     // Handle form submission logic here (e.g., save to database)
   };
 
-  const handleFormClose = () => {
-    setFormVisible(false);
-    setFormPosition(null);
-  };
-
   return (
     <div
       ref={mapContainer}
@@ -173,17 +173,11 @@ const MapComponent: React.FC = () => {
         width: "100%",
       }}
     >
-      {formVisible && formPosition && (
-        <PlaceForm
-          lng={formPosition.lng}
-          lat={formPosition.lat}
-          onSubmit={handleFormSubmit}
-          onClose={handleFormClose}
-        />
-      )}
+      <TemporaryDrawer open={open} toggleDrawer={toggleDrawer} />
     </div>
   );
 
 };
+
 
 export default MapComponent;
