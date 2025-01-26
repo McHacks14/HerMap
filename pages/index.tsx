@@ -21,10 +21,13 @@ const MapComponent: React.FC = () => {
     if (mapContainer.current) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mapbox/dark-v11",
+        style: "mapbox://styles/malakod/cm6dhj0bt00cy01qm14jc1hi1",
         center: [-74.0060152, 40.7127281],
-        zoom: 5,
-        maxZoom: 15,
+        zoom: 15.5,
+        pitch: 45,
+        bearing: -17.6,
+        maxZoom: 20,
+        antialias: true,
       });
 
       // Add zoom controls
@@ -32,8 +35,50 @@ const MapComponent: React.FC = () => {
 
       // Add fog styling
       map.on("style.load", () => {
-        map.setFog({});
+        map.setFog({}); // Add fog for 3D effect
+      
+        const labelLayerId = "road-label"; // Known label layer ID in most Mapbox styles
+        const layers = map.getStyle()?.layers;
+      
+        if (!layers || !layers.some((layer) => layer.id === labelLayerId)) {
+          console.warn("Label layer ID not found. Using a fallback.");
+        }
+      
+        map.addLayer(
+          {
+            id: "add-3d-buildings",
+            source: "composite",
+            "source-layer": "building",
+            filter: ["==", "extrude", "true"],
+            type: "fill-extrusion",
+            minzoom: 15,
+            paint: {
+              "fill-extrusion-color": "#aaa",
+              "fill-extrusion-height": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                15,
+                0,
+                15.05,
+                ["get", "height"],
+              ],
+              "fill-extrusion-base": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                15,
+                0,
+                15.05,
+                ["get", "min_height"],
+              ],
+              "fill-extrusion-opacity": 0.6,
+            },
+          },
+          labelLayerId // Add below the label layer or fallback
+        );
       });
+      
 
       type ApiResponse = Array<{
         _id: string;
@@ -43,7 +88,6 @@ const MapComponent: React.FC = () => {
         reviewText: string;
         userId: string;
       }>;
-      
 
       // Function to format API response
       const formatApiResponse = (
@@ -70,7 +114,6 @@ const MapComponent: React.FC = () => {
         try {
           const response = await fetch("http://127.0.0.1:8001/api/pins");
           const apiResponse = await response.json();
-          //console.log(response);
           console.log(apiResponse);
 
           const geojsonData = formatApiResponse(apiResponse);
