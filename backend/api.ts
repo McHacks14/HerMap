@@ -1,18 +1,6 @@
 import express, { Request, Response, RequestHandler} from 'express';
 import { PlacePin } from './models';
 
-// Sessions map (from original authentication logic)
-const sessions = new Map<string, string>();
-
-// Authentication middleware
-const auth = (req: Request, res: Response, next: Function) => {
-    const username = 'anonymous';
-    // Attach username to the request, defaulting to 'anonymous'
-    (req as any).username = username;
-    next();
-  };
-  
-
 function loadPinApi(app: express.Application): void {
   // Create a new pin
   const createPinHandler: RequestHandler = async (req: Request, res: Response): Promise<void> => {
@@ -27,7 +15,6 @@ function loadPinApi(app: express.Application): void {
   
       // Create new pin
       const newPin = new PlacePin({
-        userId: (req as any).username, // Will be 'anonymous' if no session
         latitude,
         longitude,
         safetyRating,
@@ -43,7 +30,7 @@ function loadPinApi(app: express.Application): void {
   };
   
   // Get all pins
-  app.get('/api/pins/user', auth, async (req: Request, res: Response) => {
+  app.get('/api/pins/user', async (req: Request, res: Response) => {
     try {
       const userPins = await PlacePin.find({ userId: (req as any).username });
       res.status(200).json(userPins);
@@ -52,7 +39,7 @@ function loadPinApi(app: express.Application): void {
     }
   });
 
-  app.get('/api/pins', auth, async (req: Request, res: Response) => {
+  app.get('/api/pins', async (req: Request, res: Response) => {
     try {
       const userPins = await PlacePin.find();
       res.json(userPins);
