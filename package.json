@@ -1,7 +1,10 @@
 {
   "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "mapbox-gl": "^3.9.3",
     "next": "^15.1.6",
+    "node": "^18.20.6",
     "pg": "^8.13.1",
     "react": "^19.0.0",
     "react-dev": "^0.0.1",
@@ -9,6 +12,10 @@
     "react-map-gl": "^7.1.8"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/mongoose": "^5.11.97",
     "@types/pg": "^8.11.11",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
