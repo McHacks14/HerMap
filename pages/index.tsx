@@ -81,22 +81,6 @@ const MapComponent: React.FC = () => {
           const geojsonData = formatApiResponse(apiResponse);
           console.log(geojsonData);
 
-          // for (const feature of geojsonData.features) {
-          //   const el = document.createElement('div');
-          //   el.className = 'marker';
-          //   new mapboxgl.Marker(el)
-          //     .setLngLat([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
-          //     .setPopup(
-          //       new mapboxgl.Popup({ offset: 25 }) // add popups
-          //         .setHTML(
-          //           `${feature.properties ? `<h3>${feature.properties.reviewText}</h3><p>${feature.properties.safetyRating}</p>` : 'No data available'}`
-          //         )
-          //     )
-          //     .addTo(map); 
-          //     console.log("Successfully added marker");
-          
-          // }
-
           //Load GeoJSON data on map
           map.on("load", () => {
             map.addSource("points", {
@@ -140,6 +124,16 @@ const MapComponent: React.FC = () => {
             map.on('mouseleave', 'points-layer', () => {
               map.getCanvas().style.cursor = '';
               popup.remove();
+            });
+
+            map.on('dblclick', (e) => {
+              const { lng, lat } = e.lngLat;
+
+              new mapboxgl.Marker()
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+              console.log(`New marker added at [${lng}, ${lat}]`);
             });
           });
             
