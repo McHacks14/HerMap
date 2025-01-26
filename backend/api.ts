@@ -45,7 +45,7 @@ function loadPinApi(app: express.Application): void {
 
   app.post('/send2', createPinHandler);
 
-  app.post("/send1", async (req: Request, res: Response) => {
+  app.post("/send-pin", async (req: Request, res: Response) => {
     try {
       const { latitude, longitude, safetyRating, reviewText } = req.body;
   

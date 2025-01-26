@@ -14,9 +14,38 @@ interface MovingObject {
 const MapComponent: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
+  const [currentCoords, setCurrentCoords] = React.useState<{ latitude: number | null; longitude: number | null }>({
+    latitude: null,
+    longitude: null,
+  });
 
-  const toggleDrawer = (newOpen: boolean | ((prevState: boolean) => boolean)) => () => {
-    setOpen(newOpen);
+  const toggleDrawer =
+  (newOpen: boolean | ((prevState: boolean) => boolean), longitude?: number, latitude?: number) =>
+  () => {
+    if (longitude !== undefined && latitude !== undefined) {
+      setCurrentCoords({ longitude, latitude }); // Update the coordinates state
+    }
+    setOpen(newOpen); // Open or close the drawer
+  };
+
+  const handleSave = async (data: { latitude: number; longitude: number; safetyRating: number; reviewText: string }) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8001/send-pin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      console.log(response.body);
+      if (response.ok) {
+        console.log("Pin saved successfully");
+      } else {
+        console.error("Failed to save pin");
+      }
+    } catch (error) {
+      console.error("Error saving pin:", error);
+    }
   };
 
   useEffect(() => {
@@ -31,10 +60,10 @@ const MapComponent: React.FC = () => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/malakod/cm6dhj0bt00cy01qm14jc1hi1",
-        center: [-74.0060152, 40.7127281
+        center: [-73.5765, 45.5048
           
         ],
-        zoom: 15.5,
+        zoom: 16.5,
         pitch: 45,
         bearing: -17.6,
         maxZoom: 20,
@@ -169,7 +198,7 @@ const MapComponent: React.FC = () => {
                 .setLngLat([lng, lat])
                 .addTo(map);
 
-              toggleDrawer(true)();
+              toggleDrawer(true, lng, lat)();
               // if form submitted, then create a new entry in db
               
 
@@ -231,7 +260,13 @@ const MapComponent: React.FC = () => {
       </div>
    
       {/* Form for adding a new place */}
-      <TemporaryDrawer open={open} toggleDrawer={toggleDrawer} />
+      <TemporaryDrawer
+        open={open}
+        toggleDrawer={toggleDrawer}
+        latitude={currentCoords.latitude}
+        longitude={currentCoords.longitude}
+        onSave={handleSave}
+      />
     </div>
   );
 

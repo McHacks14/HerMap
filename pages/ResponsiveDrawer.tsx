@@ -8,9 +8,12 @@ import Slider from '@mui/material/Slider';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 interface TemporaryDrawerProps {
-  open: boolean;
-  toggleDrawer: (newOpen: boolean | ((prevState: boolean) => boolean)) => () => void;
-}
+    open: boolean;
+    toggleDrawer: (newOpen: boolean | ((prevState: boolean) => boolean)) => () => void;
+    latitude: number | null;
+    longitude: number | null;
+    onSave: (data: { latitude: number; longitude: number; safetyRating: number; reviewText: string }) => void;
+  }
 
 // Custom theme with dark purple color
 const customTheme = createTheme({
@@ -26,12 +29,17 @@ const customTheme = createTheme({
   },
 });
 
-export default function TemporaryDrawer({ open, toggleDrawer }: TemporaryDrawerProps) {
-  const [formData, setFormData] = React.useState({
-    title: '',
-    description: '',
-    sliderValue: 3,
-  });
+export default function TemporaryDrawer({
+    open,
+    toggleDrawer,
+    latitude,
+    longitude,
+    onSave,
+  }: TemporaryDrawerProps) {
+    const [formData, setFormData] = React.useState({
+      safetyRating: 3,
+      reviewText: "",
+    });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -49,8 +57,12 @@ export default function TemporaryDrawer({ open, toggleDrawer }: TemporaryDrawerP
   };
 
   const handleSubmit = () => {
-    console.log('Form data submitted:', formData);
-    toggleDrawer(false)(); // Close the drawer after submission
+    
+    if (latitude !== null && longitude !== null) {
+        console.log("Saving");
+        onSave({ latitude, longitude, ...formData });
+      }
+      toggleDrawer(false)();
   };
 
   return (
@@ -79,7 +91,7 @@ export default function TemporaryDrawer({ open, toggleDrawer }: TemporaryDrawerP
           {/* Slider */}
           <Typography gutterBottom>Safety rating: 1 (not safe) to 5 (very safe)</Typography>
           <Slider
-            value={formData.sliderValue}
+            value={formData.safetyRating}
             onChange={handleSliderChange}
             aria-label="Rating"
             valueLabelDisplay="auto"
@@ -88,10 +100,11 @@ export default function TemporaryDrawer({ open, toggleDrawer }: TemporaryDrawerP
           />
 
           {/* Description Input */}
-          <TextField
+                    {/* Description Input */}
+                    <TextField
             label="Your experiences at this location"
-            name="description"
-            value={formData.description}
+            name="reviewText"
+            value={formData.reviewText}
             onChange={handleChange}
             multiline
             rows={4}
