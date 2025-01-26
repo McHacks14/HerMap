@@ -1,5 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import PlaceForm from "./PlaceForm";
+import TemporaryDrawer from "./ResponsiveDrawer";
+
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MovingObject {
@@ -10,6 +13,11 @@ interface MovingObject {
 
 const MapComponent: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = React.useState(false);
+
+  const toggleDrawer = (newOpen: boolean | ((prevState: boolean) => boolean)) => () => {
+    setOpen(newOpen);
+  };
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
@@ -80,17 +88,12 @@ const MapComponent: React.FC = () => {
         );
       });
 
-      const popup = new mapboxgl.Popup({ offset: 25 }).setText(
-        'Construction on the Washington Monument began in 1848.'
-      );
-
       type ApiResponse = Array<{
         _id: string;
         latitude: number;
         longitude: number;
         safetyRating: number;
         reviewText: string;
-        userId: string;
       }>;
 
 
@@ -100,12 +103,11 @@ const MapComponent: React.FC = () => {
       ): GeoJSON.FeatureCollection<GeoJSON.Point> => {
         return {
           type: "FeatureCollection",
-          features: apiResponse.map((item): GeoJSON.Feature<GeoJSON.Point, { safetyRating: number; reviewText: string; userId: string }> => ({
+          features: apiResponse.map((item): GeoJSON.Feature<GeoJSON.Point, { safetyRating: number; reviewText: string }> => ({
             type: "Feature",
             properties: {
               safetyRating: item.safetyRating,
-              reviewText: item.reviewText,
-              userId: item.userId,
+              reviewText: item.reviewText
             },
             geometry: {
               type: "Point",
@@ -114,6 +116,10 @@ const MapComponent: React.FC = () => {
           })),
         };
       };
+
+      const popup = new mapboxgl.Popup({ offset: 25 }).setText(
+        'Example...'
+      );
 
       const fetchData = async () => {
         try {
@@ -153,15 +159,20 @@ const MapComponent: React.FC = () => {
               map.getCanvas().style.cursor = '';
               popup.remove();
             });
-          });
 
-          // Double-click event to handle actions on double-clicking the map
-          map.on('dblclick', (e) => {
-            const { lng, lat } = e.lngLat;
+            map.on('dblclick', (e) => {
+              const { lng, lat } = e.lngLat;
 
-            new mapboxgl.Marker()
-              .setLngLat([lng, lat])
-              .addTo(map);
+              new mapboxgl.Marker()
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+              toggleDrawer(true)();
+              // if form submitted, then create a new entry in db
+              
+
+              console.log(`New marker added at [${lng}, ${lat}]`);
+            });
           });
 
         } catch (error) {
@@ -175,6 +186,11 @@ const MapComponent: React.FC = () => {
       return () => map.remove();
     }
   }, []); // Empty dependency array ensures this runs once on mount
+
+  const handleFormSubmit = (data: { lng: number; lat: number; title: string; description: string }) => {
+    console.log('Form submitted:', data);
+    // Handle form submission logic here (e.g., save to database)
+  };
 
   return (
     <div
@@ -211,9 +227,13 @@ const MapComponent: React.FC = () => {
           HerMap
         </span>
       </div>
+   
+      {/* Form for adding a new place */}
+      <TemporaryDrawer open={open} toggleDrawer={toggleDrawer} />
     </div>
   );
-  
+
 };
+
 
 export default MapComponent;
