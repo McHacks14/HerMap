@@ -10,6 +10,5 @@ const PlacePinSchema = new mongoose_1.default.Schema({
     longitude: { type: Number, required: true },
     safetyRating: { type: Number, required: true, min: 1, max: 5 },
     reviewText: { type: String, required: true },
-    userId: { type: String, required: true },
 });
-exports.PlacePin = mongoose_1.default.model('PlacePin', PlacePinSchema);
+exports.PlacePin = mongoose_1.default.model('PlacePin', PlacePinSchema, 'pins');

@@ -31,7 +31,6 @@ function loadPinApi(app) {
             }
             // Create new pin
             const newPin = new models_1.PlacePin({
-                userId: req.username, // Will be 'anonymous' if no session
                 latitude,
                 longitude,
                 safetyRating,

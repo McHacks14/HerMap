@@ -5,7 +5,6 @@ export interface PlacePinInterface {
   longitude: number;
   safetyRating: number;
   reviewText: string;
-  userId: string;
 }
 
 const PlacePinSchema = new mongoose.Schema<PlacePinInterface>({
@@ -13,7 +12,6 @@ const PlacePinSchema = new mongoose.Schema<PlacePinInterface>({
   longitude: { type: Number, required: true },
   safetyRating: { type: Number, required: true, min: 1, max: 5 },
   reviewText: { type: String, required: true },
-  userId: { type: String, required: true },
 });
 
 export const PlacePin = mongoose.model<PlacePinInterface>('PlacePin', PlacePinSchema, 'pins');
