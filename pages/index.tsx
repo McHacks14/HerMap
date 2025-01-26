@@ -31,7 +31,9 @@ const MapComponent: React.FC = () => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/malakod/cm6dhj0bt00cy01qm14jc1hi1",
-        center: [-74.0060152, 40.7127281],
+        center: [-74.0060152, 40.7127281
+          
+        ],
         zoom: 15.5,
         pitch: 45,
         bearing: -17.6,
