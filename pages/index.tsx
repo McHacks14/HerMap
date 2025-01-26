@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
+import PlaceForm from "./PlaceForm";
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -11,6 +12,8 @@ interface MovingObject {
 
 const MapComponent: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
+  const [formVisible, setFormVisible] = useState(true);
+  const [formPosition, setFormPosition] = useState<{ lng: number; lat: number } | null>(null);
 
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
@@ -37,17 +40,12 @@ const MapComponent: React.FC = () => {
         map.setFog({});
       });
 
-      const popup = new mapboxgl.Popup({ offset: 25 }).setText(
-        'Construction on the Washington Monument began in 1848.'
-      );
-
       type ApiResponse = Array<{
         _id: string;
         latitude: number;
         longitude: number;
         safetyRating: number;
         reviewText: string;
-        userId: string;
       }>;
       
 
@@ -61,8 +59,7 @@ const MapComponent: React.FC = () => {
             type: "Feature",
             properties: {
               safetyRating: item.safetyRating,
-              reviewText: item.reviewText,
-              userId: item.userId,
+              reviewText: item.reviewText
             },
             geometry: {
               type: "Point",
@@ -71,6 +68,10 @@ const MapComponent: React.FC = () => {
           })),
         };
       };
+
+      const popup = new mapboxgl.Popup({ offset: 25 }).setText(
+        'Example...'
+      );
 
       const fetchData = async () => {
         try {
@@ -133,6 +134,9 @@ const MapComponent: React.FC = () => {
                 .setLngLat([lng, lat])
                 .addTo(map);
 
+              setFormPosition({ lng, lat });
+              setFormVisible(true);
+
               console.log(`New marker added at [${lng}, ${lat}]`);
             });
           });
@@ -149,6 +153,16 @@ const MapComponent: React.FC = () => {
     }
   }, []); // Empty dependency array ensures this runs once on mount
 
+  const handleFormSubmit = (data: { lng: number; lat: number; title: string; description: string }) => {
+    console.log('Form submitted:', data);
+    // Handle form submission logic here (e.g., save to database)
+  };
+
+  const handleFormClose = () => {
+    setFormVisible(false);
+    setFormPosition(null);
+  };
+
   return (
     <div
       ref={mapContainer}
@@ -158,8 +172,18 @@ const MapComponent: React.FC = () => {
         bottom: 0,
         width: "100%",
       }}
-    />
+    >
+      {formVisible && formPosition && (
+        <PlaceForm
+          lng={formPosition.lng}
+          lat={formPosition.lat}
+          onSubmit={handleFormSubmit}
+          onClose={handleFormClose}
+        />
+      )}
+    </div>
   );
+
 };
 
 export default MapComponent;
