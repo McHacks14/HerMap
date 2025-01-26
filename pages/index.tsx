@@ -140,7 +140,12 @@ const MapComponent: React.FC = () => {
 
               popup
                 .setLngLat(coordinates as [number, number])
-                .setHTML(`<h3>${safetyRating}</h3><p>${reviewText}</p>`)
+                .setHTML(`
+                  <div style="text-align: center;">
+      <h3>${safetyRating}</h3>
+      <p>${reviewText}</p>
+    </div>
+  `)
                 .addTo(map);
             });
 
@@ -180,8 +185,35 @@ const MapComponent: React.FC = () => {
         bottom: 0,
         width: "100%",
       }}
-    />
+    >
+      {/* Banner at the top */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          backgroundColor: "#333",
+          color: "white",
+          padding: "10px 20px",
+          zIndex: 10,
+          display: "flex",
+          alignItems: "center",
+          borderRadius: "10px",
+        }}
+      >
+        <span  style={{
+            fontFamily: "'Poppins', sans-serif", // Apply the custom font
+            fontSize: "24px",
+            fontWeight: "bold",
+            marginRight: "10px",
+          }}>
+          HerMap
+        </span>
+      </div>
+    </div>
   );
+  
 };
 
 export default MapComponent;
