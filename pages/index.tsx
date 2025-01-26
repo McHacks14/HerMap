@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MovingObject {
@@ -38,14 +37,14 @@ const MapComponent: React.FC = () => {
       // Add fog styling
       map.on("style.load", () => {
         map.setFog({}); // Add fog for 3D effect
-      
+
         const labelLayerId = "road-label"; // Known label layer ID in most Mapbox styles
         const layers = map.getStyle()?.layers;
-      
+
         if (!layers || !layers.some((layer) => layer.id === labelLayerId)) {
           console.warn("Label layer ID not found. Using a fallback.");
         }
-      
+
         map.addLayer(
           {
             id: "add-3d-buildings",
@@ -80,7 +79,6 @@ const MapComponent: React.FC = () => {
           labelLayerId // Add below the label layer or fallback
         );
       });
-      
 
       const popup = new mapboxgl.Popup({ offset: 25 }).setText(
         'Construction on the Washington Monument began in 1848.'
@@ -95,13 +93,14 @@ const MapComponent: React.FC = () => {
         userId: string;
       }>;
 
+
       // Function to format API response
       const formatApiResponse = (
         apiResponse: ApiResponse
       ): GeoJSON.FeatureCollection<GeoJSON.Point> => {
         return {
           type: "FeatureCollection",
-          features: apiResponse.map((item) => ({
+          features: apiResponse.map((item): GeoJSON.Feature<GeoJSON.Point, { safetyRating: number; reviewText: string; userId: string }> => ({
             type: "Feature",
             properties: {
               safetyRating: item.safetyRating,
@@ -125,62 +124,41 @@ const MapComponent: React.FC = () => {
           const geojsonData = formatApiResponse(apiResponse);
           console.log(geojsonData);
 
-          //Load GeoJSON data on map
-          map.on("load", () => {
-            map.addSource("points", {
-              type: "geojson",
-              data: geojsonData,
-            });
+          // Load GeoJSON data on map
+          geojsonData.features.forEach((feature) => {
+            const { coordinates } = feature.geometry;
 
-            map.addLayer({
-              id: "points-layer",
-              type: "circle",
-              source: "points",
-              paint: {
-                "circle-radius": 6,
-                "circle-color": "#007cbf",
-                "circle-stroke-width": 1,
-                "circle-stroke-color": "#ffffff",
-              },
-            });
+            // Add a marker to the map
+            const marker = new mapboxgl.Marker()
+              .setLngLat(coordinates as [number, number])
+              .addTo(map);
 
-            map.on('mouseenter', 'points-layer', (e) => {
+            // Add hover effect for marker
+            marker.getElement().addEventListener('mouseenter', () => {
               map.getCanvas().style.cursor = 'pointer';
+              const { safetyRating, reviewText } = feature.properties as { safetyRating: number; reviewText: string };
 
-              const features = map.queryRenderedFeatures(e.point);
-              let longitude = (features[0].geometry as GeoJSON.Point).coordinates[0];
-              const latitude = (features[0].geometry as GeoJSON.Point).coordinates[1];
-              const { safetyRating, reviewText } = features[0].properties as { safetyRating: number; reviewText: string };
-    
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - longitude) > 180) {
-                longitude += e.lngLat.lng > longitude ? 360 : -360;
-              }
-    
               popup
-                .setLngLat([longitude, latitude])
+                .setLngLat(coordinates as [number, number])
                 .setHTML(`<h3>${safetyRating}</h3><p>${reviewText}</p>`)
                 .addTo(map);
             });
 
-            map.on('mouseleave', 'points-layer', () => {
+            marker.getElement().addEventListener('mouseleave', () => {
               map.getCanvas().style.cursor = '';
               popup.remove();
             });
-
-            map.on('dblclick', (e) => {
-              const { lng, lat } = e.lngLat;
-
-              new mapboxgl.Marker()
-                .setLngLat([lng, lat])
-                .addTo(map);
-
-              console.log(`New marker added at [${lng}, ${lat}]`);
-            });
           });
-            
+
+          // Double-click event to handle actions on double-clicking the map
+          map.on('dblclick', (e) => {
+            const { lng, lat } = e.lngLat;
+
+            new mapboxgl.Marker()
+              .setLngLat([lng, lat])
+              .addTo(map);
+          });
+
         } catch (error) {
           console.error(error);
         }
