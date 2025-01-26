@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import PlaceForm from "./PlaceForm";
 import TemporaryDrawer from "./ResponsiveDrawer";
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -20,6 +19,19 @@ const MapComponent: React.FC = () => {
   };
 
   useEffect(() => {
+    // Dynamically add the Google Font
+    const fontLink = document.createElement("link");
+    fontLink.href = "https://fonts.googleapis.com/css2?family=Monoton&display=swap";
+    fontLink.rel = "stylesheet";
+    document.head.appendChild(fontLink);
+
+    // Clean up on unmount
+    return () => {
+      document.head.removeChild(fontLink);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN) {
       console.error("Mapbox access token is missing!");
       return;
@@ -31,9 +43,7 @@ const MapComponent: React.FC = () => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/malakod/cm6dhj0bt00cy01qm14jc1hi1",
-        center: [-74.0060152, 40.7127281
-          
-        ],
+        center: [-73.5765, 45.5048],
         zoom: 15.5,
         pitch: 45,
         bearing: -17.6,
@@ -211,7 +221,6 @@ const MapComponent: React.FC = () => {
           top: 0,
           left: "50%",
           transform: "translateX(-50%)",
-          backgroundColor: "#333",
           color: "white",
           padding: "10px 20px",
           zIndex: 10,
@@ -221,21 +230,20 @@ const MapComponent: React.FC = () => {
         }}
       >
         <span  style={{
-            fontFamily: "'Poppins', sans-serif", // Apply the custom font
-            fontSize: "24px",
+            fontFamily: "'Monoton', serif", 
+            fontSize: "85px",
             fontWeight: "bold",
-            marginRight: "10px",
+            marginTop: "40px",
+            alignContent: "center",
+            justifyContent: "center",
           }}>
           HerMap
         </span>
       </div>
-   
-      {/* Form for adding a new place */}
       <TemporaryDrawer open={open} toggleDrawer={toggleDrawer} />
     </div>
   );
-
+  
 };
-
 
 export default MapComponent;

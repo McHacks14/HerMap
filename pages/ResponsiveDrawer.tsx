@@ -21,7 +21,7 @@ const customTheme = createTheme({
   },
   typography: {
     allVariants: {
-      color: '#FFFFFF', // White text for all typography components
+      color: '#FFFFFF', 
     },
   },
 });
