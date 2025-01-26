@@ -13,7 +13,7 @@ const auth = (req: Request, res: Response, next: Function) => {
   };
   
 
-function loadPinApi(app: express.Application) {
+function loadPinApi(app: express.Application): void {
   // Create a new pin
   const createPinHandler: RequestHandler = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -47,6 +47,16 @@ function loadPinApi(app: express.Application) {
     try {
       const userPins = await PlacePin.find({ userId: (req as any).username });
       res.status(200).json(userPins);
+    } catch (error) {
+      res.status(500).send('Could not retrieve user pins');
+    }
+  });
+
+  app.get('/api/pins', auth, async (req: Request, res: Response) => {
+    try {
+      const userPins = await PlacePin.find();
+      res.json(userPins);
+      console.log(userPins);
     } catch (error) {
       res.status(500).send('Could not retrieve user pins');
     }

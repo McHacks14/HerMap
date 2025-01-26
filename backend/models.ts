@@ -16,4 +16,4 @@ const PlacePinSchema = new mongoose.Schema<PlacePinInterface>({
   userId: { type: String, required: true },
 });
 
-export const PlacePin = mongoose.model<PlacePinInterface>('PlacePin', PlacePinSchema);
+export const PlacePin = mongoose.model<PlacePinInterface>('PlacePin', PlacePinSchema, 'pins');
