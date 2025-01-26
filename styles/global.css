@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
 html,
 body {
   padding: 0;
@@ -30,3 +31,5 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+
