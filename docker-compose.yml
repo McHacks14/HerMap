@@ -19,25 +19,12 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DB_URL=mongodb://mongo-database:27017/app
+      - DB_URL=mongodb://mongo-database:27017/hermap
     depends_on:
       - database
     networks:
       - app_network
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: backend
-    ports:
-      - "3000:3000"
-    environment:
-      - DB_URL=mongodb://mongo-database:27017/app
-    depends_on:
-      - database
-    networks:
-      - app_network
 
 volumes:
     mongo-data:

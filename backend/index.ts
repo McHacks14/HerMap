@@ -6,8 +6,8 @@ import api from './api';
 import cookieParser from 'cookie-parser';
 import { cookies } from 'next/headers';
 
-const dbUrl: string = process.env.DB_URL ?? "mongodb://localhost:27017/app";
-const port: number = 8000;
+const dbUrl: string = process.env.DB_URL ?? "mongodb://localhost:27017/hermap";
+const port: number = 8001;
 const app: Express = express();
 
 app.use(express.json());

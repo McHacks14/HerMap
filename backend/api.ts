@@ -51,6 +51,10 @@ function loadPinApi(app: express.Application) {
       res.status(500).send('Could not retrieve user pins');
     }
   });
+
+  app.get('/api', async (req: Request, res: Response) => {
+    res.send('Hello from the API!');
+  });
   
 }
 
