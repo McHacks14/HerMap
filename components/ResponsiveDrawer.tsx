@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Slider from '@mui/material/Slider';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-interface TemporaryDrawerProps {
+interface ResponsiveDrawerProps {
     open: boolean;
     toggleDrawer: (newOpen: boolean | ((prevState: boolean) => boolean)) => () => void;
     latitude: number | null;
@@ -29,13 +29,13 @@ const customTheme = createTheme({
   },
 });
 
-export default function TemporaryDrawer({
+export default function ResponsiveDrawer({
     open,
     toggleDrawer,
     latitude,
     longitude,
     onSave,
-  }: TemporaryDrawerProps) {
+  }: ResponsiveDrawerProps) {
     const [formData, setFormData] = React.useState({
       safetyRating: 3,
       reviewText: "",

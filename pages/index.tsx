@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import TemporaryDrawer from "./ResponsiveDrawer";
+import ResponsiveDrawer from "../components/ResponsiveDrawer";
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -271,7 +271,7 @@ const MapComponent: React.FC = () => {
       </div>
    
       {/* Form for adding a new place */}
-      <TemporaryDrawer
+      <ResponsiveDrawer
         open={open}
         toggleDrawer={toggleDrawer}
         latitude={currentCoords.latitude}
