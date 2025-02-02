@@ -29,7 +29,7 @@ const MapComponent: React.FC = () => {
 
   const handleSave = async (data: { latitude: number; longitude: number; safetyRating: number; reviewText: string }) => {
     try {
-      const response = await fetch("http://127.0.0.1:8001/send-pin", {
+      const response = await fetch("http://127.0.0.1:8001/api/send-pin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +164,7 @@ const MapComponent: React.FC = () => {
 
       const fetchData = async () => {
         try {
-          const response = await fetch("http://127.0.0.1:8001/api/pins");
+          const response = await fetch(`http://localhost:8001/api/pins`);
           const apiResponse = await response.json();
           console.log(apiResponse);
 

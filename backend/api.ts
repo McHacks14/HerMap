@@ -2,50 +2,9 @@ import express, { Request, Response, RequestHandler} from 'express';
 import { PlacePin } from './models';
 
 function loadPinApi(app: express.Application): void {
-  // Create a new pin
-  const createPinHandler: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { latitude, longitude, safetyRating, reviewText } = req.body;
 
-      // Validate input
-      if (!latitude || !longitude || !safetyRating || !reviewText) {
-        res.status(400).send('Missing required pin information');
-        return;
-      }
-  
-      // Create new pin
-      const newPin = new PlacePin({
-        latitude,
-        longitude,
-        safetyRating,
-        reviewText,
-      });
-  
-      await newPin.save();
-  
-      res.status(201).json(newPin);
-      console.log("Success");
-    } catch (error) {
-      res.status(404).send('Could not create pin');
-    }
-  };
-
-  app.post("/send", (req: Request, res: Response) => {
-    try {
-      const dataToSend = req.body; // Get data from the client
-  
-      // Make an API POST request using Axios
-      console.log("Success"); // Print success and response data
-      res.status(200).send("Data sent successfully");
-    } catch (error) {
-      res.send(error); // Print error
-      res.status(500).send("Failed to send data");
-    }
-  });
-
-  app.post('/send2', createPinHandler);
-
-  app.post("/send-pin", async (req: Request, res: Response) => {
+  // Create new pins
+  app.post("/api/send-pin", async (req: Request, res: Response) => {
     try {
       const { latitude, longitude, safetyRating, reviewText } = req.body;
   
@@ -74,14 +33,8 @@ function loadPinApi(app: express.Application): void {
       res.status(500).send('Could not create pin');
     }
   });
-
-  /* Tester method
-  app.post('/api/create', (req, res) => {
-    res.send('Hello from the API!');
-    });
-  */
   
-  // Get all pins
+  // Fetch all pins
   app.get('/api/pins', async (req: Request, res: Response) => {
     try {
       const userPins = await PlacePin.find();
@@ -92,6 +45,24 @@ function loadPinApi(app: express.Application): void {
     }
   });
 
+    /* Tester methods
+  app.post('/api/create', (req, res) => {
+    res.send('Hello from the API!');
+    });
+
+  app.post("/send", (req: Request, res: Response) => {
+    try {
+      const dataToSend = req.body; // Get data from the client
+  
+      // Make an API POST request using Axios
+      console.log("Success"); // Print success and response data
+      res.status(200).send("Data sent successfully");
+    } catch (error) {
+      res.send(error); // Print error
+      res.status(500).send("Failed to send data");
+    }
+  });
+  */
 }
 
 export default loadPinApi;
