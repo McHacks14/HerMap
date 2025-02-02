@@ -6,6 +6,10 @@ import api from './api';
 import cookieParser from 'cookie-parser';
 import { cookies } from 'next/headers';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Load env variables
+dotenv.config();
 
 const dbUrl: string = process.env.DB_URL || 'default';
 const port: number = 8001;
