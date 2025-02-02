@@ -75,12 +75,13 @@ function loadPinApi(app: express.Application): void {
     }
   });
 
+  /* Tester method
   app.post('/api/create', (req, res) => {
     res.send('Hello from the API!');
     });
+  */
   
   // Get all pins
-
   app.get('/api/pins', async (req: Request, res: Response) => {
     try {
       const userPins = await PlacePin.find();

@@ -7,9 +7,7 @@ import cookieParser from 'cookie-parser';
 import { cookies } from 'next/headers';
 import cors from 'cors';
 
-
-
-const dbUrl: string = process.env.DB_URL ?? "mongodb://localhost:27017/hermap";
+const dbUrl: string = process.env.DB_URL || 'default';
 const port: number = 8001;
 
 const app: Express = express();
